@@ -34,7 +34,7 @@ func main() {
 				fmt.Println(shortForm+"(", lineNumber, ") -> "+fullFormText)
 			}
 			if !*debug {
-				fmt.Println(shortForm + " -> " + fullFormText)
+				fmt.Println(shortForm + "," + fullFormText)
 			}
 		}
 	}
