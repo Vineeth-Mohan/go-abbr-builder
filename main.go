@@ -14,6 +14,7 @@ func main() {
 	flag.Parse()
 
 	processor := AbbreviationProcessor{}
+	processor.Init()
 
 	file, err := os.Open(*filename)
 	if err != nil {
