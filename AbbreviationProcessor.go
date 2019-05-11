@@ -61,16 +61,19 @@ func (abbrProc *AbbreviationProcessor) buildRegexForFullForm(numOfWords int) str
 	stopWordRegex := "((or|the|of|for|and)\\s+)*"
 	regex := strings.Repeat("[a-zA-Z]+\\s+"+stopWordRegex, numOfWords-1)
 	regex = regex + "[a-zA-Z]+\\s*$"
+	regex = "(?i)" + regex
 	return regex
 }
 func (abbrProc *AbbreviationProcessor) checkIfValidMatch(shortForm string, fullForm string) bool {
 	stopWordRegex := "((of|for|and)\\s+)*"
+	fmt.Println(shortForm, fullForm)
 	numOfWords := len(shortForm)
-	regex := ""
+	regex := "(?i)"
 	for i := 0; i < numOfWords; i++ {
 		firstCharacter := string(shortForm[i])
 		regex = regex + firstCharacter + "[a-zA-Z]+\\s+" + stopWordRegex
 	}
+	fmt.Println("Regex ->", regex)
 	isMatch, _ := regexp.MatchString(regex, fullForm)
 	return isMatch
 }
