@@ -65,6 +65,7 @@ func (abbrProc *AbbreviationProcessor) buildRegexForFullForm(shortForm string) s
 		firstCharacter := string(shortForm[i])
 		regex = regex + firstCharacter + "[a-zA-Z]+\\s+" + stopWordRegex
 	}
+	regex = regex + "$"
 	//fmt.Println("Regex -> ", regex)
 	return regex
 }
