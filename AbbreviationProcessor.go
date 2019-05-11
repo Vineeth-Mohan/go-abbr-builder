@@ -53,7 +53,7 @@ func (abbrProc *AbbreviationProcessor) extractFullForm(text string, shortForm st
 	if err != nil {
 		return "", err
 	}
-	fullForm = regex.FindString(text)
+	fullForm = strings.TrimSpace(regex.FindString(text))
 	return fullForm, nil
 }
 
