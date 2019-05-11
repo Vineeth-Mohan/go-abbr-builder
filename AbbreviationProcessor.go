@@ -46,7 +46,7 @@ func (abbrProc *AbbreviationProcessor) ProcessText(text string) map[string]strin
 			continue
 		}
 		// if abbrProc.isCaps.MatchString(shortForm) {
-		abbrevations[shortForm] = text
+		abbrevations[shortForm] = fullFormText
 		// }
 		startOffset = match[1]
 	}
