@@ -24,12 +24,9 @@ func (abbrProc *AbbreviationProcessor) ProcessText(text string) map[string]strin
 			continue
 		}
 		fullFormText := text[startOffset:match[0]]
-		fullFormText, err := abbrProc.extractFullForm(fullFormText, len(shortForm))
+		fullFormText, err := abbrProc.extractFullForm(fullFormText, shortForm)
 		if err != nil {
 			fmt.Println(err)
-		}
-		if !abbrProc.checkIfValidMatch(shortForm, fullFormText) {
-			continue
 		}
 		abbrevations[shortForm] = fullFormText
 		startOffset = match[1]
@@ -46,9 +43,9 @@ func (abbrProc *AbbreviationProcessor) isValidShortForm(shortForm string) bool {
 }
 
 // extractFullForm :- Function to extract full from from end
-func (abbrProc *AbbreviationProcessor) extractFullForm(text string, numOfWords int) (string, error) {
+func (abbrProc *AbbreviationProcessor) extractFullForm(text string, shortForm string) (string, error) {
 	var fullForm string
-	regexString := abbrProc.buildRegexForFullForm(numOfWords)
+	regexString := abbrProc.buildRegexForFullForm(shortForm)
 	regex, err := regexp.Compile(regexString)
 	if err != nil {
 		return "", err
@@ -57,14 +54,7 @@ func (abbrProc *AbbreviationProcessor) extractFullForm(text string, numOfWords i
 	return fullForm, nil
 }
 
-func (abbrProc *AbbreviationProcessor) buildRegexForFullForm(numOfWords int) string {
-	stopWordRegex := "((or|the|of|for|and)\\s+)*"
-	regex := strings.Repeat("[a-zA-Z]+\\s+"+stopWordRegex, numOfWords-1)
-	regex = regex + "[a-zA-Z]+\\s*$"
-	regex = "(?i)" + regex
-	return regex
-}
-func (abbrProc *AbbreviationProcessor) checkIfValidMatch(shortForm string, fullForm string) bool {
+func (abbrProc *AbbreviationProcessor) buildRegexForFullForm(shortForm string) string {
 	stopWordRegex := "((of|for|and)\\s+)*"
 	numOfWords := len(shortForm)
 	regex := "(?i)"
@@ -72,6 +62,6 @@ func (abbrProc *AbbreviationProcessor) checkIfValidMatch(shortForm string, fullF
 		firstCharacter := string(shortForm[i])
 		regex = regex + firstCharacter + "[a-zA-Z]+\\s+" + stopWordRegex
 	}
-	isMatch, _ := regexp.MatchString(regex, fullForm)
-	return isMatch
+	//fmt.Println("Regex -> ", regex)
+	return regex
 }
