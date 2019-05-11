@@ -8,12 +8,26 @@ import (
 
 // AbbreviationProcessor :- Class to process text and extract possible abbrevation
 type AbbreviationProcessor struct {
-	regex *regexp.Regexp
+	regex         *regexp.Regexp
+	isCaps        *regexp.Regexp
+	stopWordRegex string
+}
+
+// Init :- Initializes the values
+func (abbrProc *AbbreviationProcessor) Init() {
+	abbrProc.regex, _ = regexp.Compile("\\(\\s*[a-zA-Z]+\\s*\\)")
+	abbrProc.isCaps = regexp.MustCompile(`^[A-Z]+$`)
+	abbrProc.stopWordRegex = "((the|of|for|and|in|on|de)\\s+)*"
+}
+
+func cleanText(text string) string {
+	text = strings.Replace(text, " 's", "'s", -1)
+	return text
 }
 
 // ProcessText :- Process a sentence and extract short form and its full form
 func (abbrProc *AbbreviationProcessor) ProcessText(text string) map[string]string {
-	abbrProc.regex, _ = regexp.Compile("\\(\\s*[a-zA-Z]+\\s*\\)")
+	text = cleanText(text)
 	matches := abbrProc.regex.FindAllStringIndex(text, -1)
 	startOffset := 0
 	abbrevations := make(map[string]string)
@@ -23,15 +37,17 @@ func (abbrProc *AbbreviationProcessor) ProcessText(text string) map[string]strin
 		if !abbrProc.isValidShortForm(shortForm) {
 			continue
 		}
-		fullFormText := text[startOffset:match[0]]
-		fullFormText, err := abbrProc.extractFullForm(fullFormText, shortForm)
+		text := text[startOffset:match[0]]
+		fullFormText, err := abbrProc.extractFullForm(text, shortForm)
 		if err != nil {
 			fmt.Println(err)
 		}
 		if len(fullFormText) == 0 {
 			continue
 		}
-		abbrevations[shortForm] = fullFormText
+		// if abbrProc.isCaps.MatchString(shortForm) {
+		abbrevations[shortForm] = text
+		// }
 		startOffset = match[1]
 	}
 	return abbrevations
@@ -58,12 +74,11 @@ func (abbrProc *AbbreviationProcessor) extractFullForm(text string, shortForm st
 }
 
 func (abbrProc *AbbreviationProcessor) buildRegexForFullForm(shortForm string) string {
-	stopWordRegex := "((of|for|and)\\s+)*"
 	numOfWords := len(shortForm)
 	regex := "(?i)"
 	for i := 0; i < numOfWords; i++ {
 		firstCharacter := string(shortForm[i])
-		regex = regex + firstCharacter + "[a-zA-Z]+\\s+" + stopWordRegex
+		regex = regex + firstCharacter + "[a-zA-Z']+[\\s,-]+" + abbrProc.stopWordRegex
 	}
 	regex = regex + "$"
 	//fmt.Println("Regex -> ", regex)
