@@ -28,6 +28,9 @@ func (abbrProc *AbbreviationProcessor) ProcessText(text string) map[string]strin
 		if err != nil {
 			fmt.Println(err)
 		}
+		if len(fullFormText) == 0 {
+			continue
+		}
 		abbrevations[shortForm] = fullFormText
 		startOffset = match[1]
 	}
